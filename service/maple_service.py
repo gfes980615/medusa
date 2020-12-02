@@ -21,21 +21,20 @@ chrome_options.add_argument('--headless')
 # chrome_options.add_argument('--disable-dev-shm-usage')
 
 def get_page_bulletin():
-    # driver = webdriver.Chrome(executable_path=webdriver_path, options=options,chrome_options=chrome_options)
-    # driver.get('https://tw.beanfun.com/maplestory/main')
-    # firstPageResult = driver.page_source
-    firstPageResult = readFile("maple.txt")
+    driver = webdriver.Chrome(executable_path=webdriver_path, options=options,chrome_options=chrome_options)
+    driver.get('https://tw.beanfun.com/maplestory/main')
+    firstPageResult = driver.page_source
     result = get_bulletin_content([], firstPageResult)
-    # for index in range(1):
-    #     button = driver.find_element_by_xpath("//li[@class='page-item next']")
-    #     driver.execute_script("arguments[0].click();", button)
-    #     WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "mBulletin-items-link")))
-    #     response_text = driver.page_source
-    #     result = get_bulletin_content(result, response_text)
+    for True:
+        button = driver.find_element_by_xpath("//li[@class='page-item next']")
+        driver.execute_script("arguments[0].click();", button)
+        WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.CLASS_NAME, "mBulletin-items-link")))
+        response_text = driver.page_source
+        result = get_bulletin_content(result, response_text)
     
     add_to_maple_bulletin(result)
 
-    # driver.close()
+    driver.close()
     return result
 
 def get_bulletin_content(result, response_text):

@@ -1,4 +1,5 @@
 from database.mysql import db
+import re
 
 class MapleBulletin(db.Model):
     __tablename__ = 'maple_bulletin'
@@ -13,3 +14,15 @@ class MapleBulletin(db.Model):
         self.date = date
         self.title = title
         self.category = category
+    
+    def addItem(self):
+        db.session.add(self)
+        try:
+            db.session.commit()
+        except BaseException as e:
+            if re.match("(.*)1062, (.*)", e.args[0]) == False:
+                print(e)
+        finally:
+            db.session.remove()
+
+        
