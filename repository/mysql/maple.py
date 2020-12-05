@@ -1,6 +1,10 @@
 from database.mysql import db
 from model.po import MapleBulletin
+import datetime
 import sys
+
+def get_all_bulletin():
+    return MapleBulletin.query.all()
 
 def add_to_maple_bulletin(items):
     for item in items:
