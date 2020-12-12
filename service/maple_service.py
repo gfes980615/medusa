@@ -12,6 +12,7 @@ from utils.file import readFile
 import time
 import re
 from database.redis import r
+import json
 
 def init_redis_bulletin():
     items = get_all_bulletin()
@@ -21,12 +22,12 @@ def init_redis_bulletin():
 options = Options()
 webdriver_path = './chromedriver.exe'
 chrome_options = webdriver.ChromeOptions()
-rootURL = "https://tw.beanfun.com/maplestory/main"
+rootURL = "https://tw.beanfun.com/maplestory/"
+mainURL = "https://tw.beanfun.com/maplestory/main"
 chrome_options.add_argument('--headless')
 # chrome_options.add_argument('--disable-gpu')
 # chrome_options.add_argument('--no-sandbox')
 # chrome_options.add_argument('--disable-dev-shm-usage')
-
 
 def get_realtime_bulletin():
     driver = create_maple_driver_conn()
@@ -41,14 +42,19 @@ def get_realtime_bulletin():
             driver = next_page_driver(driver)
             response_text = driver.page_source
             result, _ = get_bulletin_content(response_text)
-            unRecordResult = get_unRecord_bulletin(result)
-            if len(unRecordResult) == 0:
+            subUnRecordResult = get_unRecord_bulletin(result)
+            if len(subUnRecordResult) == 0:
                 break
-            add_to_maple_bulletin(unRecordResult)
-            redis_cache_maple_bulletin(unRecordResult)
+            add_to_maple_bulletin(subUnRecordResult)
+            redis_cache_maple_bulletin(subUnRecordResult)
+            for sub in subUnRecordResult:
+                unRecordResult.append(sub)
 
     driver.close()
-    return result
+    if len(unRecordResult) != 0:
+        r.lpush("maple_bulletin", json.dumps(unRecordResult))
+
+    return unRecordResult
 
 def get_init_bulletin(date):
     driver = create_maple_driver_conn()
@@ -96,7 +102,7 @@ def get_bulletin_content(response_text):
 
 def create_maple_driver_conn():
     driver = webdriver.Chrome(executable_path=webdriver_path, options=options,chrome_options=chrome_options)
-    driver.get(rootURL)
+    driver.get(mainURL)
     return driver
 
 def next_page_driver(driver):
