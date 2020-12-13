@@ -20,7 +20,7 @@ def init_redis_bulletin():
         r.set(item.url, item.id)
 
 options = Options()
-webdriver_path = './chromedriver'
+webdriver_path = '/usr/local/medusa/dist/chromedriver'
 chrome_options = webdriver.ChromeOptions()
 rootURL = "https://tw.beanfun.com/maplestory/"
 mainURL = "https://tw.beanfun.com/maplestory/main"
