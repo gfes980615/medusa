@@ -1,5 +1,4 @@
-from selenium import webdriver 
-from selenium.webdriver.chrome.options import Options
+from .glob import create_driver_conn
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,20 +13,13 @@ import re
 from database.redis import r
 import json
 
+rootURL = "https://tw.beanfun.com/maplestory/"
+mainURL = "https://tw.beanfun.com/maplestory/main"
+
 def init_redis_bulletin():
     items = get_all_bulletin()
     for item in items:
         r.set(item.url, item.id)
-
-options = Options()
-webdriver_path = '/usr/local/medusa/dist/chromedriver'
-chrome_options = webdriver.ChromeOptions()
-rootURL = "https://tw.beanfun.com/maplestory/"
-mainURL = "https://tw.beanfun.com/maplestory/main"
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
 
 def get_realtime_bulletin():
     driver = create_maple_driver_conn()
@@ -101,8 +93,7 @@ def get_bulletin_content(response_text):
     return result, endDate
 
 def create_maple_driver_conn():
-    driver = webdriver.Chrome(executable_path=webdriver_path, options=options,chrome_options=chrome_options)
-    driver.get(mainURL)
+    driver = create_driver_conn(mainURL)
     return driver
 
 def next_page_driver(driver):
